@@ -2,6 +2,16 @@ defaultNamespace: cattle-monitoring-system
 labels:
   Bundle: rancher-alerting
 
+helm:
+  chart: prometheus-msteams
+  releaseName: prometheus-msteams
+  repo: https://prometheus-msteams.github.io
+  version: v1.5.1
+  valuesFrom:
+    - configMapKeyRef:
+        name: prometheus-msteams-values
+        key: values.yaml
+
 targetCustomizations:
   - name: dev 
     ClusterName: dev-cluster

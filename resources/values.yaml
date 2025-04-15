@@ -1,21 +1,38 @@
-replicaCount: 1
-image:
-  repository: quay.io/prometheusmsteams/prometheus-msteams
-  tag: v1.5.1
+apiVersion: v1 
+kind: ConfigMap 
+metadata:
+  name: prometheus-msteams-values
+type: Opaque 
+data: 
+  values.yaml: |-
+    replicaCount: 1
+    image:
+      repository: quay.io/prometheusmsteams/prometheus-msteams
+      tag: v1.5.1
 
-connectors:
-# in alertmanager, this will be used as http://prometheus-msteams:2000/bar
-- bar: https://outlook.office.com/webhook/xxxx/xxxx
-# in alertmanager, this will be used as http://prometheus-msteams:2000/foo
-- foo: https://outlook.office.com/webhook/xxxx/xxxx
+    connectors:
+      - critical:
+          url: ${CRITICAL_WEBHOOK_URL}
+      - warning:
+          url: ${WARNING_WEBHOOK_URL}
 
-# extraEnvs is useful for adding extra environment variables
+    
+    metrics:
+      serviceMonitor:
+        enabled: true
+        additionalLabels:
+          release: prometheus # change this accordingly
+        scrapeInterval: 30s
 
-# Enable metrics for prometheus operator
-metrics:
-  serviceMonitor:
-    enabled: true
-    additionalLabels:
-      release: prometheus # change this accordingly
-    scrapeInterval: 30s
+    extraEnvs:
+      - name:  CRITICAL_WEBHOOK_URL
+        valueFrom:
+          secretKeyRef:
+            name: prometheus-msteams-webhooks
+            key: critical
+      - name:  WARNING_WEBHOOK_URL
+        valueFrom:
+          secretKeyRef:
+            name: prometheus-msteams-webhooks
+            key: warning
   

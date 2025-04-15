@@ -1,0 +1,9 @@
+defaultNamespace: cattle-monitoring-system
+labels:
+  Bundle: rancher-alerting
+
+targetCustomizations:
+  - name: dev 
+    ClusterName: dev-cluster
+    kustomize:
+      dir: overlays/dev
